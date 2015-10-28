@@ -287,7 +287,7 @@ def wxs_to_dict(layer, wxs_url, org_dict, group_dict, pdf_dict,
     ds_NAME = ds_name.upper()
     
     # Theme, Keywords and Group (only from WMS parent layer)
-    d["tagstring"] = ["SLIP Classic", "Harvested"]
+    d["tag_string"] = ["SLIP Classic", "Harvested"]
     try:
         p = layer.parent.title
         
@@ -303,7 +303,7 @@ def wxs_to_dict(layer, wxs_url, org_dict, group_dict, pdf_dict,
         
         grp_name = grp_dict.get("name", None)
         if grp_name:
-            d["tag_string"] += grp_name
+            d["tag_string"].append(grp_name)
         
     except:
         if debug:
