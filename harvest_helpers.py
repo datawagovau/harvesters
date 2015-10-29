@@ -324,10 +324,10 @@ def wxs_to_dict(layer, wxs_url, org_dict, group_dict, pdf_dict,
         owner_org_contact = ""
         owner_org_jurisdiction = "Western Australia (default)"
     
-    slip_description = "[Learn how to access](https://www2.landgate"+\
-    ".wa.gov.au/web/guest/how-to-access-slip-services) this resource "+\
-    "URL in a GIS (e.g. QGIS or ArcGIS) with your SLIP credentials to view "+\
-    "this dataset as layer _{0}_".format(ds_NAME)
+    slip_description = u"when prompted, use your [SLIP](https://www2.landgate.wa.gov.au/"+\
+    u"web/guest/how-to-access-slip-services) "+\
+    u"username and password to preview the resource below "+\
+    u"or open the resource URL in a GIS application (e.g. QGIS or ArcGIS) as layer _{0}_.".format(ds_NAME)
 
     d["name"] = slugify(ds_title)
     d["title"] = ds_title
