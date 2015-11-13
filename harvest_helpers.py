@@ -391,6 +391,87 @@ def wxs_to_dict(layer, wxs_url, org_dict, group_dict, pdf_dict,
     return d
 
 
+
+def gs28_to_ckan(layer, wxs_url, ckan, 
+                 fallback_org_id=None, res_format="WMS", debug=False):
+    """Convert a GeoServer 2.8 WMS layer into a dict of a datawagovau-schema CKAN package.
+    
+    This function is tailored towards kmi.dpaw.wa.gov.au's implementation.
+    """
+
+    d = dict()
+    
+    org_name = layer.name.split(":")[0]
+    try:
+        owner_org = ckan.action.organization_show(id=org_name)
+        owner_org_id = owner_org["id"]
+    except NotFound:
+        owner_org_id = fallback_org_id
+
+    d["name"] = slugify(layer.name)
+    d["title"] = layer.title
+    #d["doi"] = ""
+    #d["citation"] = ""
+    d["notes"] = layer.abstract or ""
+    d["owner_org"] = owner_org_id
+    d["tag_string"] = ["Knowledge Management Initiative", "KMI", "Harvested"]
+    d["data_portal"] = "http://kmi.dpaw.wa.gov.au/geoserver/web/"
+    d["data_homepage"] = ""
+    d["license_id"] = "cc-by-sa"
+    d["author"] = layer.parent.title
+    d["author_email"] = ""
+    d["maintainer_email"] = "marinedatarequests@dpaw.wa.gov.au"
+    d["maintainer"] = "Marine Data Manager"
+    d["private"] = False
+    d["spatial"] = bboxWGSs84_to_gjMP(layer.boundingBoxWGS84)
+    #d["published_on"] = None
+    #d["last_updated_on"] = None
+    d["update_frequency"] = "frequent"
+    #d["data_temporal_extent_begin"] = ""
+    #d["data_temporal_extent_end"] = ""
+
+    resource_list = []
+        
+    # Attach WMS/WFS endpoint as resource
+    r = dict()
+    r["description"] = layer.parent.title
+    r["format"] = res_format.lower()
+    r["name"] = "{0} {1}".format(layer.title, res_format.upper())
+    r["url"] = wxs_url
+    r["{0}_layer".format(res_format.lower())] = layer.name
+    resource_list.append(r)
+    
+    d["resources"] = resource_list
+    
+    if debug:
+        print("[wxs_to_dict] Returning package dict \n{0}".format(str(d)))
+
+    return d
+
+def get_layer_dict_gs28(wxs, wxs_url, ckanapi, 
+                        fallback_org_name='dpaw', res_format="WMS", 
+                        debug=False):
+    """Return a list of CKAN API package_show-compatible dicts
+    
+    Arguments:
+    
+        wxs A wxsclient loaded from a WXS enpoint
+        wxs_url The WXS endpoint URL to use as dataset resource URL
+        ckanapi A ckanapi instance with at least read permission
+        org_dict A dict of CKAN org names and ids
+        pdf_dict A dict of dataset names and corresponding PDF URLs
+        debug Debug noise
+        fallback_org_name The fallback CKAN org name , default:'lgate'    
+    
+    Returns:
+        A list of CKAN API package_show-compatible dicts
+    """
+    foid = ckanapi.action.organization_show(id=fallback_org_name)["id"]
+    return [gs28_to_ckan(wxs.contents[layername], wxs_url, ckanapi, 
+                        fallback_org_id=foid, res_format=res_format,
+                        debug=debug) for layername in wxs.contents]
+
+
 def add_resource_to_list(resourcedict_list, resource_dict, debug=False):
     """Add a single resource_dict to a resourcedict_list if URL is unique
     

@@ -63,3 +63,7 @@ secret.py
 *.html
 *.json
 *.csv
+
+.Rhistory
+.ipynb_checkpoints/
+
