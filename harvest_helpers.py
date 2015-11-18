@@ -174,20 +174,23 @@ def parse_name(text, debug=False):
     return (t, n, dt)
 
 
-def bboxWGSs84_to_gjMP(bbox):
+def bboxWGS84_to_gjMP(bbox):
     """Return a WMS layer's layer.
     
     Arguments:
         bbox (owslib.wms.ContentMetadata.boundingBoxWGS84): A WGS84 bbox 
-            from an owslib WMS layer content
+            from an owslib WxS layer content
     
     Returns:
-        dict A GeoJSON MultiPolygon Geometry string in WGS84
+        dict A GeoJSON MultiPolygon Geometry string in WGS84 or an empty String
     """
-    e, s, w, n = bbox
-    return json.dumps({"type": "MultiPolygon", 
-                       "coordinates": [[[[e,n],[e,s],[w,s],[w,n]]]]})
-
+    try:
+        e, s, w, n = bbox
+        return json.dumps({"type": "MultiPolygon", 
+                           "coordinates": [[[[e,n],[e,s],[w,s],[w,n]]]]})
+    except:
+        return ""
+        
 
 def wxs_to_dict(layer, wxs_url, org_dict, group_dict, pdf_dict, 
                 fallback_org_id=None, res_format="WMS", debug=False):
@@ -346,13 +349,14 @@ def wxs_to_dict(layer, wxs_url, org_dict, group_dict, pdf_dict,
     
     d["data_portal"] = "http://slip.landgate.wa.gov.au/"
     d["data_homepage"] = ""
-    d["license_id"] = "cc-by-sa"
+    d["license_title"] = "Other (Open)"
+    d["license_id"] = "other-open"
     d["author"] = owner_org_title
     d["author_email"] = owner_org_contact
     d["maintainer_email"] = "customerservice@landgate.wa.gov.au"
     d["maintainer"] = "Landgate"
     d["private"] = False
-    d["spatial"] = bboxWGSs84_to_gjMP(layer.boundingBoxWGS84)
+    d["spatial"] = bboxWGS84_to_gjMP(layer.boundingBoxWGS84)
     d["published_on"] = date_pub
     d["last_updated_on"] = date_pub
     d["update_frequency"] = "frequent"
