@@ -427,7 +427,7 @@ def gs28_to_ckan(layer, wxs_url, ckan,
     d["maintainer_email"] = "marinedatarequests@dpaw.wa.gov.au"
     d["maintainer"] = "Marine Data Manager"
     d["private"] = False
-    d["spatial"] = bboxWGSs84_to_gjMP(layer.boundingBoxWGS84)
+    d["spatial"] = bboxWGS84_to_gjMP(layer.boundingBoxWGS84)
     #d["published_on"] = None
     #d["last_updated_on"] = None
     d["update_frequency"] = "frequent"
